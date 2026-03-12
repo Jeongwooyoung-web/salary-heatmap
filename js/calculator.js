@@ -41,12 +41,58 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("contribution").value =
           teacher.scores.contrib.toFixed(1);
 
+        // 수동 오프셋 값 로드 (없으면 0)
+        currentManualOffset = teacher.manualOffset || 0;
+        updateOffsetDisplay();
+
         // 자동 계산
         calculateSalary();
       }
     });
+
+    // 수동 증감 버튼 이벤트 리스너 등록
+    const btnDecrease = document.getElementById("btnDecreaseRate");
+    const btnIncrease = document.getElementById("btnIncreaseRate");
+
+    if (btnDecrease && btnIncrease) {
+      btnDecrease.addEventListener("click", () => {
+        if (!teacherSelect.value) return;
+        currentManualOffset -= 1;
+        updateOffsetDisplay();
+        calculateSalary();
+      });
+
+      btnIncrease.addEventListener("click", () => {
+        if (!teacherSelect.value) return;
+        currentManualOffset += 1;
+        updateOffsetDisplay();
+        calculateSalary();
+      });
+    }
   }
 });
+
+// 전역 오프셋 변수 및 UI 업데이트 보조 함수
+let currentManualOffset = 0;
+
+function updateOffsetDisplay() {
+  const display = document.getElementById("manualOffsetDisplay");
+  if (display) {
+    const sign = currentManualOffset >= 0 ? "+" : "";
+    display.textContent = `${sign}${currentManualOffset.toFixed(1)}`;
+    // 색상 변경 (양수면 초록, 음수면 빨강, 0이면 회색)
+    if (currentManualOffset > 0) {
+      display.className =
+        "px-2 py-1 text-xs font-bold min-w-[50px] text-center text-green-600 bg-green-50";
+    } else if (currentManualOffset < 0) {
+      display.className =
+        "px-2 py-1 text-xs font-bold min-w-[50px] text-center text-red-600 bg-red-50";
+    } else {
+      display.className =
+        "px-2 py-1 text-xs font-bold min-w-[50px] text-center text-gray-700 bg-white";
+    }
+  }
+}
 
 // 계산기 로직
 function calculateSalary() {
@@ -81,6 +127,11 @@ function calculateSalary() {
   } else {
     rate = 22;
   }
+
+  // 수동 조정 값(Offset) 더하기
+  rate += currentManualOffset;
+  // 최소 0 이하로 떨어지지 않도록 방어 로직 (선택사항)
+  if (rate < 0) rate = 0;
 
   // Rate Math Floor
   rate = Math.floor(rate * 10) / 10;
@@ -121,6 +172,7 @@ function calculateSalary() {
       teachers[teacherIndex].weighted = parseFloat(avg.toFixed(2));
       teachers[teacherIndex].grade = grade;
       teachers[teacherIndex].rate = rate;
+      teachers[teacherIndex].manualOffset = currentManualOffset; // 조정된 Offset 갱신 보관
 
       // 등급이 하락 및 임금 변동이 발생했을 수 있으므로 salary 재계산 (현재 rate 기준 한달 근로시 대략적, 예: salary = rate * constant )
       // 그러나 여기선 간단히 rate 변동치만 적용하거나 기존 비율대로 유지
