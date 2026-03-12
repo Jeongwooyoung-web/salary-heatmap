@@ -30,11 +30,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const teacher = teachers.find((t) => t.name === teacherName);
       if (teacher) {
         // 데이터 매핑 (기존 데이터와 계산기 입력폼 매칭)
-        // instruction: (inst + ret) / 2
-        document.getElementById("instruction").value = (
-          (teacher.scores.inst + teacher.scores.ret) /
-          2
-        ).toFixed(1);
+        document.getElementById("instruction").value =
+          teacher.scores.inst.toFixed(1);
+        document.getElementById("retention").value =
+          teacher.scores.ret.toFixed(1);
         document.getElementById("punctuality").value =
           teacher.scores.punct.toFixed(1);
         document.getElementById("admin").value =
@@ -52,30 +51,32 @@ document.addEventListener("DOMContentLoaded", () => {
 // 계산기 로직
 function calculateSalary() {
   const vInst = parseFloat(document.getElementById("instruction").value) || 0;
+  const vRet = parseFloat(document.getElementById("retention").value) || 0;
   const vPunct = parseFloat(document.getElementById("punctuality").value) || 0;
   const vAdmin = parseFloat(document.getElementById("admin").value) || 0;
   const vContrib =
     parseFloat(document.getElementById("contribution").value) || 0;
 
-  // 가중치 평균 (기본적인 단순 평균 예시, 실제 MANGOI 기준에 맞춰 보정 가능)
-  // 기존 data.js의 weighted 점수 산출 방식과 유사하게 (4+항목 / 4)
-  const avg = (vInst + vPunct + vAdmin + vContrib) / 4;
+  // 가중치 평균 계산 (MANGOI 기준)
+  // 수업(25%), 학생유지(30%), 출석(20%), 행정(15%), 기여도(10%)
+  const avg =
+    vInst * 0.25 + vRet * 0.3 + vPunct * 0.2 + vAdmin * 0.15 + vContrib * 0.1;
 
   let grade = "Needs Improvement";
   let rate = 22; // Base Rate / 10min
   let bgColor = "#ef4444"; // red-500
 
-  if (avg >= 4.5) {
+  if (avg >= 4.75) {
     grade = "Outstanding";
-    rate = 32 + (avg - 4.5) * 5; // 점수에 비례해 추가 금액 배정 로직 (예시)
+    rate = 32 + (avg - 4.75) * 5; // 점수에 비례해 추가 금액 배정 로직 (예시)
     bgColor = "#10b981"; // green-500
-  } else if (avg >= 4.0) {
+  } else if (avg >= 4.5) {
     grade = "Very Satisfactory";
-    rate = 28 + (avg - 4.0) * 4;
+    rate = 28 + (avg - 4.5) * 4;
     bgColor = "#3b82f6"; // blue-500
-  } else if (avg >= 3.0) {
+  } else if (avg >= 3.5) {
     grade = "Satisfactory";
-    rate = 25 + (avg - 3.0) * 2;
+    rate = 25 + (avg - 3.5) * 2;
     bgColor = "#6b7280"; // gray-500
   } else {
     rate = 22;
