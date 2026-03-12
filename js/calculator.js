@@ -104,6 +104,13 @@ function calculateSalary() {
     const teacherIndex = teachers.findIndex((t) => t.name === selectedName);
 
     if (teacherIndex !== -1) {
+      const confirmation = confirm(
+        "Are you sure? This will update the teacher's score across all dashboard menus.",
+      );
+      if (!confirmation) {
+        return; // 사용자가 취소하면 localStorage에 저장하지 않음 (UI상 결과는 미리보기로만 남게 됨)
+      }
+
       teachers[teacherIndex].scores = {
         inst: vInst,
         ret: vRet,
