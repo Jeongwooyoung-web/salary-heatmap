@@ -96,4 +96,34 @@ function calculateSalary() {
   gradeEl.style.backgroundColor = bgColor;
 
   document.getElementById("salaryRate").textContent = `₱${rate.toFixed(2)}`;
+
+  // 글로벌 상태(localStorage) 갱신
+  const teacherSelect = document.getElementById("teacherSelect");
+  if (teacherSelect && teacherSelect.value) {
+    const selectedName = teacherSelect.value;
+    const teacherIndex = teachers.findIndex((t) => t.name === selectedName);
+
+    if (teacherIndex !== -1) {
+      teachers[teacherIndex].scores = {
+        inst: vInst,
+        ret: vRet,
+        punct: vPunct,
+        admin: vAdmin,
+        contrib: vContrib,
+      };
+      teachers[teacherIndex].weighted = parseFloat(avg.toFixed(2));
+      teachers[teacherIndex].grade = grade;
+      teachers[teacherIndex].rate = rate;
+
+      // 등급이 하락 및 임금 변동이 발생했을 수 있으므로 salary 재계산 (현재 rate 기준 한달 근로시 대략적, 예: salary = rate * constant )
+      // 그러나 여기선 간단히 rate 변동치만 적용하거나 기존 비율대로 유지
+      const oldRate = teachers[teacherIndex].rate;
+      if (oldRate > 0) {
+        teachers[teacherIndex].salary =
+          (teachers[teacherIndex].salary / oldRate) * rate;
+      }
+
+      saveData();
+    }
+  }
 }

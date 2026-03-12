@@ -1,6 +1,6 @@
 // js/data.js
 
-const teachers = [
+const defaultTeachers = [
   {
     name: "KES",
     status: "office",
@@ -212,6 +212,27 @@ const teachers = [
     rate: 28.07,
   },
 ];
+
+// LocalStorage 상태 관리
+let teachers = [];
+
+function initData() {
+  const storedData = localStorage.getItem("mangoi_teachers_data");
+  if (storedData) {
+    teachers = JSON.parse(storedData);
+  } else {
+    teachers = JSON.parse(JSON.stringify(defaultTeachers));
+    localStorage.setItem("mangoi_teachers_data", JSON.stringify(teachers));
+  }
+}
+
+// 갱신 후 저장 함수 (다른 파트에서 갱신 후 호출)
+function saveData() {
+  localStorage.setItem("mangoi_teachers_data", JSON.stringify(teachers));
+}
+
+// 스크립트 로드 시 즉시 데이터 초기화
+initData();
 
 const gradeOrder = {
   Outstanding: 0,
