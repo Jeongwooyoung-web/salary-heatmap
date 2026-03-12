@@ -52,11 +52,23 @@ const i18nDict = {
       en: "Automatically calculates tuition fee per 10 mins and final grade based on evaluation scores.",
       tl: "Awtomatikong kinakalkula ang tuition fee bawat 10 minuto at pinal na grado base sa iskor.",
     },
+  "항목별 평가 점수를 기준으로 10분당 수업료 및 최종 등급을 자동으로 계산합니다.":
+    {
+      ko: "항목별 평가 점수를 기준으로 10분당 수업료 및 최종 등급을 자동으로 계산합니다.",
+      en: "Automatically calculates tuition fee per 10 mins and final grade based on evaluation scores.",
+      tl: "Awtomatikong kinakalkula ang tuition fee bawat 10 minuto at pinal na grado base sa iskor.",
+    },
   "개별 교사들의 상세 평가 리포트 및 지표를 확인합니다.": {
     ko: "개별 교사들의 상세 평가 리포트 및 지표를 확인합니다.",
     en: "Check detailed evaluation reports and metrics for individual teachers.",
     tl: "Suriin ang detalyadong ulat ng pagsusuri at sukatan para sa mga indibidwal na guro.",
   },
+  "교사들의 평가 지표와 출석률 데이터를 표 형식의 히트맵으로 한눈에 분석합니다.":
+    {
+      ko: "교사들의 평가 지표와 출석률 데이터를 표 형식의 히트맵으로 한눈에 분석합니다.",
+      en: "Analyze teachers' evaluation metrics and attendance data at a glance with a tabular heatmap.",
+      tl: "Suriin ang mga sukatan ng pagsusuri ng mga guro at data ng pagdalo sa isang sulyap.",
+    },
 
   // Calculator
   "(수업료 계산기)": {
