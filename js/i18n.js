@@ -189,7 +189,8 @@ function translateDOM(lang) {
 
     let orig = node._i18nKey;
     if (!orig) {
-      let t = node.textContent.trim();
+      // 줄바꿈과 다중 공백을 하나의 공백으로 정규화
+      let t = node.textContent.trim().replace(/\s+/g, " ");
       if (i18nDict[t]) {
         orig = t;
         node._i18nKey = orig;
