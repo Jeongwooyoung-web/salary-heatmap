@@ -385,66 +385,11 @@
                       >(10분당 수업료)</span
                     ></span
                   >
-                  <div class="flex flex-col items-end gap-1">
-                    <span
-                      class="font-bold text-3xl text-primary-600"
-                      id="salaryRate"
-                      >-</span
-                    >
-                    <!-- 수동 증감 버튼 UI -->
-                    <div
-                      class="flex items-center bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm mt-1"
-                    >
-                      <button
-                        type="button"
-                        id="btnDecreaseRate"
-                        class="px-2 py-1 bg-gray-50 hover:bg-gray-100 text-gray-600 transition-colors border-r border-gray-200"
-                        title="Decrease Rate (-1)"
-                      >
-                        <svg
-                          class="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M20 12H4"
-                          ></path>
-                        </svg>
-                      </button>
-                      <div
-                        class="px-2 py-1 text-xs font-bold text-gray-700 min-w-[50px] text-center"
-                        id="manualOffsetDisplay"
-                      >
-                        ±0.0
-                      </div>
-                      <button
-                        type="button"
-                        id="btnIncreaseRate"
-                        class="px-2 py-1 bg-gray-50 hover:bg-gray-100 text-gray-600 transition-colors border-l border-gray-200"
-                        title="Increase Rate (+1)"
-                      >
-                        <svg
-                          class="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 4v16m8-8H4"
-                          ></path>
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
+                  <span
+                    class="font-bold text-3xl text-primary-600"
+                    id="salaryRate"
+                    >-</span
+                  >
                 </div>
               </div>
             </div>
@@ -495,7 +440,31 @@
                           >Outstanding (최우수)</span
                         >
                       </td>
-                      <td class="font-bold text-right">₱32+</td>
+                      <td class="text-right">
+                        <div class="flex items-center justify-end gap-1">
+                          <button
+                            type="button"
+                            class="btn-rate-adjust text-xs px-1.5 py-0.5 bg-gray-100 border border-gray-200 hover:bg-gray-200 text-gray-600 rounded"
+                            data-grade="outstanding"
+                            data-action="decrease"
+                          >
+                            -
+                          </button>
+                          <span
+                            class="font-bold min-w-[32px] text-center text-primary-600"
+                            id="rate-val-outstanding"
+                            >₱32</span
+                          >
+                          <button
+                            type="button"
+                            class="btn-rate-adjust text-xs px-1.5 py-0.5 bg-gray-100 border border-gray-200 hover:bg-gray-200 text-gray-600 rounded"
+                            data-grade="outstanding"
+                            data-action="increase"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                     <tr>
                       <td class="py-2">4.50 ~ 4.74</td>
@@ -505,7 +474,31 @@
                           >Very Satisfactory (우수)</span
                         >
                       </td>
-                      <td class="font-bold text-right">₱28+</td>
+                      <td class="text-right">
+                        <div class="flex items-center justify-end gap-1">
+                          <button
+                            type="button"
+                            class="btn-rate-adjust text-xs px-1.5 py-0.5 bg-gray-100 border border-gray-200 hover:bg-gray-200 text-gray-600 rounded"
+                            data-grade="very_satisfactory"
+                            data-action="decrease"
+                          >
+                            -
+                          </button>
+                          <span
+                            class="font-bold min-w-[32px] text-center text-primary-600"
+                            id="rate-val-very_satisfactory"
+                            >₱28</span
+                          >
+                          <button
+                            type="button"
+                            class="btn-rate-adjust text-xs px-1.5 py-0.5 bg-gray-100 border border-gray-200 hover:bg-gray-200 text-gray-600 rounded"
+                            data-grade="very_satisfactory"
+                            data-action="increase"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                     <tr>
                       <td class="py-2">3.50 ~ 4.49</td>
@@ -515,7 +508,31 @@
                           >Satisfactory (보통)</span
                         >
                       </td>
-                      <td class="font-bold text-right">₱25+</td>
+                      <td class="text-right">
+                        <div class="flex items-center justify-end gap-1">
+                          <button
+                            type="button"
+                            class="btn-rate-adjust text-xs px-1.5 py-0.5 bg-gray-100 border border-gray-200 hover:bg-gray-200 text-gray-600 rounded"
+                            data-grade="satisfactory"
+                            data-action="decrease"
+                          >
+                            -
+                          </button>
+                          <span
+                            class="font-bold min-w-[32px] text-center text-primary-600"
+                            id="rate-val-satisfactory"
+                            >₱25</span
+                          >
+                          <button
+                            type="button"
+                            class="btn-rate-adjust text-xs px-1.5 py-0.5 bg-gray-100 border border-gray-200 hover:bg-gray-200 text-gray-600 rounded"
+                            data-grade="satisfactory"
+                            data-action="increase"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                     <tr>
                       <td class="py-2">Below 3.50</td>
@@ -525,7 +542,31 @@
                           >Needs Improvement (미달)</span
                         >
                       </td>
-                      <td class="font-bold text-right">₱22+</td>
+                      <td class="text-right">
+                        <div class="flex items-center justify-end gap-1">
+                          <button
+                            type="button"
+                            class="btn-rate-adjust text-xs px-1.5 py-0.5 bg-gray-100 border border-gray-200 hover:bg-gray-200 text-gray-600 rounded"
+                            data-grade="needs_improvement"
+                            data-action="decrease"
+                          >
+                            -
+                          </button>
+                          <span
+                            class="font-bold min-w-[32px] text-center text-primary-600"
+                            id="rate-val-needs_improvement"
+                            >₱22</span
+                          >
+                          <button
+                            type="button"
+                            class="btn-rate-adjust text-xs px-1.5 py-0.5 bg-gray-100 border border-gray-200 hover:bg-gray-200 text-gray-600 rounded"
+                            data-grade="needs_improvement"
+                            data-action="increase"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   </tbody>
                 </table>

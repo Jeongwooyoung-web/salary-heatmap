@@ -41,57 +41,83 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("contribution").value =
           teacher.scores.contrib.toFixed(1);
 
-        // 수동 오프셋 값 로드 (없으면 0)
-        currentManualOffset = teacher.manualOffset || 0;
-        updateOffsetDisplay();
+        // Rate 테이블 렌더링
+        renderRateTable(teacher);
 
         // 자동 계산
         calculateSalary();
       }
     });
 
-    // 수동 증감 버튼 이벤트 리스너 등록
-    const btnDecrease = document.getElementById("btnDecreaseRate");
-    const btnIncrease = document.getElementById("btnIncreaseRate");
+    // 화면 로드 시 Rate 테이블 초기화 (디폴트값)
+    renderRateTable(null);
 
-    if (btnDecrease && btnIncrease) {
-      btnDecrease.addEventListener("click", () => {
-        if (!teacherSelect.value) return;
-        currentManualOffset -= 1;
-        updateOffsetDisplay();
-        calculateSalary();
-      });
+    // Rate 기준 수동 증감 버튼 이벤트 리스너 (이벤트 위임)
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest(".btn-rate-adjust");
+      if (!btn) return;
 
-      btnIncrease.addEventListener("click", () => {
-        if (!teacherSelect.value) return;
-        currentManualOffset += 1;
-        updateOffsetDisplay();
-        calculateSalary();
-      });
-    }
+      const teacherName = teacherSelect.value;
+      if (!teacherName) {
+        alert("교사를 먼저 선택해주세요. (Select a teacher first)");
+        return;
+      }
+
+      const teacherIndex = teachers.findIndex((t) => t.name === teacherName);
+      if (teacherIndex === -1) return;
+
+      const teacher = teachers[teacherIndex];
+      // 교사별 수동 Rate 데이터가 없다면 디폴트로 초기화
+      if (!teacher.customRates) {
+        teacher.customRates = {
+          outstanding: 32,
+          very_satisfactory: 28,
+          satisfactory: 25,
+          needs_improvement: 22,
+        };
+      }
+
+      const gradeKey = btn.dataset.grade;
+      const action = btn.dataset.action;
+
+      if (action === "increase") {
+        teacher.customRates[gradeKey] += 1;
+      } else if (action === "decrease") {
+        teacher.customRates[gradeKey] -= 1;
+        if (teacher.customRates[gradeKey] < 0)
+          teacher.customRates[gradeKey] = 0; // 최소 0 보장
+      }
+
+      // UI 즉각 갱신
+      document.getElementById(`rate-val-${gradeKey}`).textContent =
+        `₱${teacher.customRates[gradeKey]}`;
+
+      // 재계산 및 로컬스토리지 저장 트리거 (자동 저장)
+      calculateSalary();
+    });
   }
 });
 
-// 전역 오프셋 변수 및 UI 업데이트 보조 함수
-let currentManualOffset = 0;
+// 화면 내 Rate 테이블 값들을 교사별 데이터로 그려주는 함수
+function renderRateTable(teacher) {
+  const defaultRates = {
+    outstanding: 32,
+    very_satisfactory: 28,
+    satisfactory: 25,
+    needs_improvement: 22,
+  };
+  const rates =
+    teacher && teacher.customRates ? teacher.customRates : defaultRates;
 
-function updateOffsetDisplay() {
-  const display = document.getElementById("manualOffsetDisplay");
-  if (display) {
-    const sign = currentManualOffset >= 0 ? "+" : "";
-    display.textContent = `${sign}${currentManualOffset.toFixed(1)}`;
-    // 색상 변경 (양수면 초록, 음수면 빨강, 0이면 회색)
-    if (currentManualOffset > 0) {
-      display.className =
-        "px-2 py-1 text-xs font-bold min-w-[50px] text-center text-green-600 bg-green-50";
-    } else if (currentManualOffset < 0) {
-      display.className =
-        "px-2 py-1 text-xs font-bold min-w-[50px] text-center text-red-600 bg-red-50";
-    } else {
-      display.className =
-        "px-2 py-1 text-xs font-bold min-w-[50px] text-center text-gray-700 bg-white";
-    }
-  }
+  const elOut = document.getElementById("rate-val-outstanding");
+  const elVery = document.getElementById("rate-val-very_satisfactory");
+  const elSat = document.getElementById("rate-val-satisfactory");
+  const elNeeds = document.getElementById("rate-val-needs_improvement");
+
+  if (elOut) elOut.textContent = `₱${rates.outstanding}`;
+  if (elVery) elVery.textContent = `₱${rates.very_satisfactory}`;
+  if (elSat) elSat.textContent = `₱${rates.satisfactory}`;
+  if (elNeeds) elNeeds.textContent = `₱${rates.needs_improvement}`;
 }
 
 // 계산기 로직
@@ -108,30 +134,41 @@ function calculateSalary() {
   const avg =
     vInst * 0.25 + vRet * 0.3 + vPunct * 0.2 + vAdmin * 0.15 + vContrib * 0.1;
 
+  const teacherSelect = document.getElementById("teacherSelect");
+  const teacherName = teacherSelect ? teacherSelect.value : null;
+  const teacher = teacherName
+    ? teachers.find((t) => t.name === teacherName)
+    : null;
+
+  const defaultRates = {
+    outstanding: 32,
+    very_satisfactory: 28,
+    satisfactory: 25,
+    needs_improvement: 22,
+  };
+  const currentRates =
+    teacher && teacher.customRates ? teacher.customRates : defaultRates;
+
   let grade = "Needs Improvement";
-  let rate = 22; // Base Rate / 10min
+  let gradeKey = "needs_improvement";
   let bgColor = "#ef4444"; // red-500
 
   if (avg >= 4.75) {
     grade = "Outstanding";
-    rate = 32 + (avg - 4.75) * 5; // 점수에 비례해 추가 금액 배정 로직 (예시)
+    gradeKey = "outstanding";
     bgColor = "#10b981"; // green-500
   } else if (avg >= 4.5) {
     grade = "Very Satisfactory";
-    rate = 28 + (avg - 4.5) * 4;
+    gradeKey = "very_satisfactory";
     bgColor = "#3b82f6"; // blue-500
   } else if (avg >= 3.5) {
     grade = "Satisfactory";
-    rate = 25 + (avg - 3.5) * 2;
+    gradeKey = "satisfactory";
     bgColor = "#6b7280"; // gray-500
-  } else {
-    rate = 22;
   }
 
-  // 수동 조정 값(Offset) 더하기
-  rate += currentManualOffset;
-  // 최소 0 이하로 떨어지지 않도록 방어 로직 (선택사항)
-  if (rate < 0) rate = 0;
+  // 지정된 테이블 Rate 값 그대로 적용 (단순화 / 비례 증가 없음)
+  let rate = currentRates[gradeKey];
 
   // Rate Math Floor
   rate = Math.floor(rate * 10) / 10;
@@ -149,7 +186,6 @@ function calculateSalary() {
   document.getElementById("salaryRate").textContent = `₱${rate.toFixed(2)}`;
 
   // 글로벌 상태(localStorage) 갱신
-  const teacherSelect = document.getElementById("teacherSelect");
   if (teacherSelect && teacherSelect.value) {
     const selectedName = teacherSelect.value;
     const teacherIndex = teachers.findIndex((t) => t.name === selectedName);
@@ -172,7 +208,6 @@ function calculateSalary() {
       teachers[teacherIndex].weighted = parseFloat(avg.toFixed(2));
       teachers[teacherIndex].grade = grade;
       teachers[teacherIndex].rate = rate;
-      teachers[teacherIndex].manualOffset = currentManualOffset; // 조정된 Offset 갱신 보관
 
       // 등급이 하락 및 임금 변동이 발생했을 수 있으므로 salary 재계산 (현재 rate 기준 한달 근로시 대략적, 예: salary = rate * constant )
       // 그러나 여기선 간단히 rate 변동치만 적용하거나 기존 비율대로 유지
