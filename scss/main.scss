@@ -1,0 +1,18 @@
+// 1. Base (Variables, Reset, Mixins)
+@import "base/variables";
+@import "base/mixins";
+@import "base/reset";
+
+// 2. Layouts
+@import "layout/header";
+
+// 3. Components (Will be added as we build)
+// @import 'components/form';
+// @import 'components/card';
+// @import 'components/button';
+// @import 'components/heatmap';
+
+// 4. Pages
+@import "pages/home";
+// @import 'pages/heatmap';
+// @import 'pages/calculator';

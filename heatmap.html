@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MANGOI | Data Heatmap</title>
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ["Noto Sans KR", "sans-serif"] },
+            colors: {
+              primary: {
+                50: "#f0f7ff",
+                500: "#0c8ee6",
+                600: "#0070c4",
+                900: "#0b406d",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="bg-gray-50 font-sans text-gray-800">
+    <header class="header">
+      <div
+        class="header__container max-w-6xl mx-auto px-4 py-4 flex justify-between items-center"
+      >
+        <div
+          class="header__logo font-bold text-2xl text-primary-600 tracking-tight"
+        >
+          <a href="index.html"
+            >MANGOI
+            <span class="text-sm font-normal text-gray-500">Dashboard</span></a
+          >
+        </div>
+        <nav class="header__nav">
+          <ul class="flex space-x-6 text-sm font-medium text-gray-600">
+            <li>
+              <a
+                href="index.html"
+                class="header__nav-link hover:text-primary-500 transition-colors"
+                >Home</a
+              >
+            </li>
+            <li>
+              <a
+                href="heatmap.html"
+                class="header__nav-link header__nav-link--active text-primary-600"
+                >Heatmap</a
+              >
+            </li>
+            <li>
+              <a
+                href="treemap.html"
+                class="header__nav-link hover:text-primary-500 transition-colors"
+                >Treemap</a
+              >
+            </li>
+            <li>
+              <a
+                href="calculator.html"
+                class="header__nav-link hover:text-primary-500 transition-colors"
+                >Salary Calculator</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">
+          Data Heatmap
+          <span class="text-lg font-normal text-gray-500">(데이터 히트맵)</span>
+        </h1>
+        <p class="text-gray-600">
+          교사 평가에 따른 급여 데이터를 표 형식의 그리드로 시각화합니다.
+        </p>
+      </div>
+
+      <!-- 히트맵 컨테이너 (그리드) -->
+      <div
+        class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 overflow-x-auto"
+      >
+        <div id="heatmap-container" class="min-w-[800px]">
+          <!-- JS로 채워짐 -->
+        </div>
+      </div>
+    </main>
+
+    <!-- 공통 데이터 스크립트 분리 (나중에 treemap, calculator에서도 쓸 수 있도록) -->
+    <script src="js/data.js"></script>
+    <script src="js/heatmap.js"></script>
+  </body>
+</html>

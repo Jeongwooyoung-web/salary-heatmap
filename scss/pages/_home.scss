@@ -1,0 +1,16 @@
+// _home.scss (index.html 메인 스타일)
+.dashboard-main {
+  min-height: calc(100vh - 70px); // header height
+}
+
+.card {
+  &--interactive {
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+
+    &:hover {
+      border-color: $color-primary-200;
+    }
+  }
+}

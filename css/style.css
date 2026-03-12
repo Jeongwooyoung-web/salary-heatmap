@@ -1,0 +1,77 @@
+/* 컴파일된 CSS (SCSS에서 수동 변환) */
+
+/* base/_reset.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: "Noto Sans KR", sans-serif;
+  color: #1f2937;
+  background-color: #f9fafb;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+ul {
+  list-style: none;
+}
+button,
+input,
+select {
+  font-family: inherit;
+  outline: none;
+  border: none;
+  background: none;
+}
+button {
+  cursor: pointer;
+}
+
+/* layout/_header.css */
+.header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.header__container {
+  height: 70px;
+}
+.header__logo a {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.header__nav-link {
+  padding: 8px 12px;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease-in-out;
+}
+.header__nav-link--active {
+  background-color: #f0f7ff;
+  font-weight: 600;
+  color: #0070c4;
+}
+.header__nav-link:hover:not(.header__nav-link--active) {
+  background-color: #f9fafb;
+}
+
+/* pages/_home.css */
+.dashboard-main {
+  min-height: calc(100vh - 70px);
+}
+.card--interactive {
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  transition: all 0.2s ease-in-out;
+}
+.card--interactive:hover {
+  border-color: #b9dffc !important;
+}

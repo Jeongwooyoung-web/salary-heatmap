@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MANGOI | Salary Calculator</title>
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ["Noto Sans KR", "sans-serif"] },
+            colors: {
+              primary: {
+                50: "#f0f7ff",
+                500: "#0c8ee6",
+                600: "#0070c4",
+                900: "#0b406d",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="bg-gray-50 font-sans text-gray-800">
+    <header class="header">
+      <div
+        class="header__container max-w-6xl mx-auto px-4 py-4 flex justify-between items-center"
+      >
+        <div
+          class="header__logo font-bold text-2xl text-primary-600 tracking-tight"
+        >
+          <a href="index.html"
+            >MANGOI
+            <span class="text-sm font-normal text-gray-500">Dashboard</span></a
+          >
+        </div>
+        <nav class="header__nav">
+          <ul class="flex space-x-6 text-sm font-medium text-gray-600">
+            <li>
+              <a
+                href="index.html"
+                class="header__nav-link hover:text-primary-500 transition-colors"
+                >Home</a
+              >
+            </li>
+            <li>
+              <a
+                href="heatmap.html"
+                class="header__nav-link hover:text-primary-500 transition-colors"
+                >Heatmap</a
+              >
+            </li>
+            <li>
+              <a
+                href="treemap.html"
+                class="header__nav-link hover:text-primary-500 transition-colors"
+                >Treemap</a
+              >
+            </li>
+            <li>
+              <a
+                href="calculator.html"
+                class="header__nav-link header__nav-link--active text-primary-600"
+                >Salary Calculator</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-8">
+      <div
+        class="calculator bg-white shadow-sm border border-gray-200 rounded-xl overflow-hidden p-6 md:p-8"
+        id="calculator"
+      >
+        <!-- 헤더 영역 -->
+        <div class="calculator__header mb-8 border-b border-gray-100 pb-6">
+          <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-4"
+          >
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900 leading-tight">
+                Salary Calculator
+              </h1>
+              <span class="text-gray-500 text-sm">(수업료 계산기)</span>
+            </div>
+
+            <!-- 교사 이름 자동입력 -->
+            <div class="w-full md:w-64 relative">
+              <label
+                class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide"
+                >Select Teacher</label
+              >
+              <select
+                id="teacherSelect"
+                class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-shadow"
+              >
+                <option value="">-- 직접 입력 또는 선택 --</option>
+                <!-- JS data.js 활용 -->
+              </select>
+            </div>
+          </div>
+          <p class="text-sm text-gray-600">
+            Enter scores to calculate the rate per 10 minutes
+            <span class="text-xs text-gray-400 block"
+              >(각 항목별 평가 점수를 입력하면 10분당 수업료를 계산해
+              드립니다.)</span
+            >
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- 왼쪽 폼 영역 -->
+          <form
+            class="calculator__form space-y-5"
+            id="salaryForm"
+            onsubmit="
+              event.preventDefault();
+              calculateSalary();
+            "
+          >
+            <!-- 수업 / 학생 평가 -->
+            <div class="calculator__field">
+              <label
+                class="block text-sm font-bold text-gray-700 mb-1"
+                for="instruction"
+              >
+                Instruction / Retention
+                <span class="text-xs font-normal text-gray-400 ml-1"
+                  >(수업·학생유지) / 5.0</span
+                >
+              </label>
+              <input
+                class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-all"
+                type="number"
+                id="instruction"
+                min="1"
+                max="5"
+                step="0.1"
+                placeholder="1.0 ~ 5.0"
+                required
+              />
+            </div>
+
+            <!-- 출석 점수 -->
+            <div class="calculator__field">
+              <label
+                class="block text-sm font-bold text-gray-700 mb-1"
+                for="punctuality"
+              >
+                Punctuality / Attendance
+                <span class="text-xs font-normal text-gray-400 ml-1"
+                  >(출석률) / 5.0</span
+                >
+              </label>
+              <input
+                class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-all"
+                type="number"
+                id="punctuality"
+                min="1"
+                max="5"
+                step="0.1"
+                placeholder="1.0 ~ 5.0"
+                required
+              />
+            </div>
+
+            <!-- 행정 평가 -->
+            <div class="calculator__field">
+              <label
+                class="block text-sm font-bold text-gray-700 mb-1"
+                for="admin"
+              >
+                Admin Evaluation
+                <span class="text-xs font-normal text-gray-400 ml-1"
+                  >(행정업무) / 5.0</span
+                >
+              </label>
+              <input
+                class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-all"
+                type="number"
+                id="admin"
+                min="1"
+                max="5"
+                step="0.1"
+                placeholder="1.0 ~ 5.0"
+                required
+              />
+            </div>
+
+            <!-- 기여도 점수 -->
+            <div class="calculator__field">
+              <label
+                class="block text-sm font-bold text-gray-700 mb-1"
+                for="contribution"
+              >
+                Contribution Grade
+                <span class="text-xs font-normal text-gray-400 ml-1"
+                  >(기여도) / 5.0</span
+                >
+              </label>
+              <input
+                class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-all"
+                type="number"
+                id="contribution"
+                min="1"
+                max="5"
+                step="0.1"
+                placeholder="1.0 ~ 5.0"
+                required
+              />
+            </div>
+
+            <!-- 계산 버튼 -->
+            <div class="pt-4">
+              <button
+                class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-lg shadow-sm transition-colors text-lg"
+                type="submit"
+                id="calculateBtn"
+              >
+                Calculate
+                <span class="text-sm font-normal opacity-80">(계산하기)</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- 오른쪽 결과 및 기준표 영역 -->
+          <div>
+            <!-- 결과 패널 -->
+            <div
+              class="calculator__result bg-gray-50 rounded-lg p-6 border border-gray-200 mb-6 min-h-[220px] flex flex-col justify-center"
+              id="resultArea"
+            >
+              <div id="resultPlaceholder" class="text-center text-gray-500">
+                <svg
+                  class="w-12 h-12 mx-auto mb-3 text-gray-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                  ></path>
+                </svg>
+                <p>Please enter scores and click Calculate</p>
+                <span class="text-xs block mt-1"
+                  >(점수를 입력하고 계산하기 버튼을 눌러주세요)</span
+                >
+              </div>
+
+              <div id="resultContent" class="hidden space-y-4">
+                <div
+                  class="flex justify-between items-center pb-3 border-b border-gray-200"
+                >
+                  <span class="text-gray-600 font-medium"
+                    >Average Score
+                    <span class="text-xs text-gray-400">(평균)</span></span
+                  >
+                  <span class="font-bold text-xl text-gray-900" id="avgScore"
+                    >-</span
+                  >
+                </div>
+                <div
+                  class="flex justify-between items-center pb-3 border-b border-gray-200"
+                >
+                  <span class="text-gray-600 font-medium"
+                    >Grade
+                    <span class="text-xs text-gray-400">(종합 등급)</span></span
+                  >
+                  <span
+                    class="font-bold px-3 py-1 rounded text-white shadow-sm text-sm"
+                    id="gradeText"
+                    style="background-color: #6b7280"
+                    >-</span
+                  >
+                </div>
+                <div class="flex justify-between items-center pt-2">
+                  <span class="text-gray-800 font-bold text-lg"
+                    >Rate per 10min
+                    <span class="text-xs text-gray-500 font-normal block"
+                      >(10분당 수업료)</span
+                    ></span
+                  >
+                  <span
+                    class="font-bold text-3xl text-primary-600"
+                    id="salaryRate"
+                    >-</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- 수업료 기준표 -->
+            <details
+              class="bg-white border border-gray-200 rounded-lg group"
+              open
+            >
+              <summary
+                class="font-bold text-gray-800 cursor-pointer px-4 py-3 bg-gray-50 rounded-t-lg select-none list-none flex justify-between items-center object-cover"
+              >
+                Rate Table
+                <span class="text-sm text-gray-500 font-normal ml-2"
+                  >(수업료 기준표)</span
+                >
+                <span class="transition group-open:rotate-180">
+                  <svg
+                    fill="none"
+                    height="24"
+                    shape-rendering="geometricPrecision"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                    width="24"
+                  >
+                    <path d="M6 9l6 6 6-6"></path>
+                  </svg>
+                </span>
+              </summary>
+              <div class="p-4 pt-2">
+                <table class="w-full text-sm text-center border-collapse">
+                  <thead>
+                    <tr class="text-gray-500 border-b border-gray-200">
+                      <th class="py-2 font-medium">Average Score</th>
+                      <th class="py-2 font-medium">Grade (등급)</th>
+                      <th class="py-2 font-medium text-right">Rate</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100 text-gray-700">
+                    <tr>
+                      <td class="py-2">4.5+</td>
+                      <td>
+                        <span
+                          class="text-green-600 font-bold text-xs bg-green-50 px-2 py-0.5 rounded"
+                          >Outstanding (최우수)</span
+                        >
+                      </td>
+                      <td class="font-bold text-right">₱32+</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2">4.0 ~ 4.49</td>
+                      <td>
+                        <span
+                          class="text-blue-600 font-bold text-xs bg-blue-50 px-2 py-0.5 rounded"
+                          >Very Satisfactory (우수)</span
+                        >
+                      </td>
+                      <td class="font-bold text-right">₱28+</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2">3.0 ~ 3.99</td>
+                      <td>
+                        <span
+                          class="text-gray-600 font-bold text-xs bg-gray-100 px-2 py-0.5 rounded"
+                          >Satisfactory (보통)</span
+                        >
+                      </td>
+                      <td class="font-bold text-right">₱25+</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2">Below 3.0</td>
+                      <td>
+                        <span
+                          class="text-red-500 font-bold text-xs bg-red-50 px-2 py-0.5 rounded"
+                          >Needs Improvement (미달)</span
+                        >
+                      </td>
+                      <td class="font-bold text-right">₱22+</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="js/data.js"></script>
+    <script src="js/calculator.js"></script>
+  </body>
+</html>

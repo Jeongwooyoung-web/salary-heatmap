@@ -1,549 +1,200 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MANGOI Teachers - Salary Heatmap</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  html, body {
-    height: 100%;
-    overflow: hidden;
-  }
-
-  body {
-    background: #1a1a2e;
-    font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .header {
-    padding: 16px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #0f0f23;
-    border-bottom: 1px solid #2a2a4a;
-  }
-
-  .header h1 {
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    color: #e0e0e0;
-  }
-
-  .header .subtitle {
-    font-size: 11px;
-    color: #888;
-    margin-top: 2px;
-  }
-
-  .legend {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    font-size: 11px;
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .legend-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 2px;
-  }
-
-  .controls {
-    padding: 10px 24px;
-    background: #0f0f23;
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    font-size: 11px;
-    border-bottom: 1px solid #2a2a4a;
-  }
-
-  .controls label {
-    color: #888;
-  }
-
-  .controls select {
-    background: #1a1a2e;
-    color: #fff;
-    border: 1px solid #3a3a5a;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-family: inherit;
-    font-size: 11px;
-    cursor: pointer;
-  }
-
-  .treemap-container {
-    flex: 1;
-    display: flex;
-    padding: 6px;
-    gap: 6px;
-    min-height: 300px;
-    overflow: hidden;
-  }
-
-  .group {
-    display: flex;
-    flex-direction: column;
-    border-radius: 4px;
-    overflow: hidden;
-  }
-
-  .group-header {
-    padding: 6px 12px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #aaa;
-    background: rgba(255,255,255,0.03);
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-  }
-
-  .group-body {
-    flex: 1;
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    padding: 3px;
-    gap: 3px;
-  }
-
-  .cell {
-    position: relative;
-    border-radius: 3px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 4px;
-  }
-
-  .cell:hover {
-    filter: brightness(1.3);
-    z-index: 10;
-    box-shadow: 0 0 20px rgba(255,255,255,0.15);
-    transform: scale(1.02);
-  }
-
-  .cell .name {
-    font-weight: 700;
-    line-height: 1.1;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
-    white-space: nowrap;
-  }
-
-  .cell .salary {
-    opacity: 0.9;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
-    white-space: nowrap;
-  }
-
-  .cell .grade-tag {
-    font-size: 8px;
-    opacity: 0.7;
-    margin-top: 2px;
-    white-space: nowrap;
-  }
-
-  .cell .rate {
-    font-size: 9px;
-    opacity: 0.6;
-    margin-top: 1px;
-  }
-
-  /* Grade colors */
-  .grade-outstanding { background: linear-gradient(135deg, #00c853, #1b8a2e); }
-  .grade-very-satisfactory { background: linear-gradient(135deg, #2e7d32, #1b5e20); }
-  .grade-satisfactory { background: linear-gradient(135deg, #555, #444); }
-  .grade-needs-improvement { background: linear-gradient(135deg, #c62828, #8b1a1a); }
-
-  .tooltip {
-    display: none;
-    position: fixed;
-    background: #0f0f23;
-    border: 1px solid #3a3a5a;
-    border-radius: 8px;
-    padding: 14px 18px;
-    font-size: 12px;
-    z-index: 1000;
-    pointer-events: none;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-    min-width: 220px;
-  }
-
-  .tooltip.visible { display: block; }
-
-  .tooltip .t-name {
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #2a2a4a;
-  }
-
-  .tooltip .t-row {
-    display: flex;
-    justify-content: space-between;
-    margin: 4px 0;
-  }
-
-  .tooltip .t-label { color: #888; }
-  .tooltip .t-value { font-weight: 600; }
-
-  .footer {
-    padding: 8px 24px;
-    background: #0f0f23;
-    border-top: 1px solid #2a2a4a;
-    display: flex;
-    justify-content: space-between;
-    font-size: 10px;
-    color: #666;
-  }
-
-  .total-box {
-    background: rgba(255,255,255,0.05);
-    padding: 3px 10px;
-    border-radius: 4px;
-    color: #aaa;
-  }
-</style>
-</head>
-<body>
-
-<div class="header">
-  <div>
-    <h1>MANGOI TEACHERS — 교사 급여 히트맵</h1>
-    <div class="subtitle">크기 = 월급 | 색상 = 평가 등급</div>
-  </div>
-  <div class="legend">
-    <div class="legend-item"><div class="legend-dot" style="background:#00c853"></div> Outstanding</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#2e7d32"></div> Very Satisfactory</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#555"></div> Satisfactory</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#c62828"></div> Needs Improvement</div>
-  </div>
-</div>
-
-<div class="controls">
-  <label>정렬 기준:</label>
-  <select id="sortBy">
-    <option value="salary">월급 (높은순)</option>
-    <option value="grade">평가 등급</option>
-    <option value="rate">시급 (높은순)</option>
-    <option value="name">이름순</option>
-  </select>
-  <label style="margin-left:12px">그룹:</label>
-  <select id="groupBy">
-    <option value="status">근무형태 (Office/Home)</option>
-    <option value="grade">평가 등급</option>
-    <option value="none">없음</option>
-  </select>
-</div>
-
-<div class="treemap-container" id="treemap"></div>
-
-<div class="tooltip" id="tooltip"></div>
-
-<div class="footer">
-  <div class="total-box" id="totalInfo"></div>
-  <div>Teacher Evaluation Report — MANGOI</div>
-</div>
-
-<script>
-const teachers = [
-  { name:"KES", status:"office", years:5, scores:{inst:5,ret:5,punct:4,admin:4,contrib:5}, weighted:4.65, grade:"Very Satisfactory", salary:10174.3, rate:29.58 },
-  { name:"BELLE", status:"home", years:1, scores:{inst:4,ret:5,punct:5,admin:5,contrib:5}, weighted:4.75, grade:"Outstanding", salary:7288, rate:24.96 },
-  { name:"HT FARRAH", status:"office", years:5, scores:{inst:5,ret:4,punct:5,admin:5,contrib:5}, weighted:4.70, grade:"Very Satisfactory", salary:15800.5, rate:50.32 },
-  { name:"RICA", status:"office", years:5, scores:{inst:5,ret:5,punct:4,admin:5,contrib:5}, weighted:4.80, grade:"Outstanding", salary:8674.3, rate:32.86 },
-  { name:"CINDY", status:"office", years:2, scores:{inst:5,ret:4,punct:5,admin:5,contrib:5}, weighted:4.70, grade:"Very Satisfactory", salary:20931, rate:34.09 },
-  { name:"JANE", status:"office", years:5, scores:{inst:5,ret:4,punct:5,admin:5,contrib:5}, weighted:4.70, grade:"Very Satisfactory", salary:13426, rate:28.57 },
-  { name:"ANA", status:"office", years:2, scores:{inst:5,ret:4,punct:5,admin:5,contrib:5}, weighted:4.70, grade:"Very Satisfactory", salary:12924, rate:29.37 },
-  { name:"KAYE", status:"office", years:1, scores:{inst:5,ret:4,punct:5,admin:5,contrib:5}, weighted:4.70, grade:"Very Satisfactory", salary:18960, rate:28.47 },
-  { name:"ZEE", status:"office", years:1, scores:{inst:4,ret:4,punct:5,admin:5,contrib:5}, weighted:4.45, grade:"Satisfactory", salary:10267, rate:29.33 },
-  { name:"HT NESS", status:"home", years:5, scores:{inst:5,ret:4,punct:5,admin:5,contrib:5}, weighted:4.70, grade:"Very Satisfactory", salary:14503, rate:65.33 },
-  { name:"MARIANE", status:"home", years:5, scores:{inst:5,ret:4,punct:5,admin:5,contrib:5}, weighted:4.70, grade:"Very Satisfactory", salary:6550, rate:25.79 },
-  { name:"JINETTE", status:"home", years:2, scores:{inst:5,ret:4,punct:5,admin:5,contrib:5}, weighted:4.70, grade:"Very Satisfactory", salary:8625, rate:25.52 },
-  { name:"JENNY", status:"home", years:2, scores:{inst:5,ret:5,punct:5,admin:4,contrib:5}, weighted:4.85, grade:"Outstanding", salary:1700, rate:25.00 },
-  { name:"SID", status:"office", years:1, scores:{inst:5,ret:3,punct:4,admin:5,contrib:5}, weighted:4.20, grade:"Satisfactory", salary:12193, rate:29.59 },
-  { name:"CHAINE", status:"home", years:5, scores:{inst:5,ret:4,punct:5,admin:5,contrib:5}, weighted:4.70, grade:"Very Satisfactory", salary:10999.3, rate:25.82 },
-  { name:"KRYSTEL", status:"home", years:1, scores:{inst:4,ret:4,punct:5,admin:5,contrib:4}, weighted:4.35, grade:"Satisfactory", salary:9675, rate:25.06 },
-  { name:"SHAS", status:"office", years:1, scores:{inst:5,ret:4,punct:5,admin:5,contrib:5}, weighted:4.70, grade:"Very Satisfactory", salary:12614, rate:28.41 },
-  { name:"LEN", status:"home", years:1, scores:{inst:4,ret:4,punct:3,admin:2,contrib:3}, weighted:3.40, grade:"Needs Improvement", salary:8270, rate:25.06 },
-  { name:"WIN", status:"office", years:1, scores:{inst:5,ret:4,punct:3,admin:1,contrib:5}, weighted:3.70, grade:"Satisfactory", salary:8425, rate:28.46 },
-  { name:"JED", status:"home", years:1, scores:{inst:5,ret:5,punct:1,admin:4,contrib:2}, weighted:3.75, grade:"Satisfactory", salary:2900, rate:26.85 },
-  { name:"FAYE", status:"home", years:5, scores:{inst:3,ret:5,punct:1,admin:3,contrib:1}, weighted:3.00, grade:"Needs Improvement", salary:7914.5, rate:28.07 },
-];
-
-const gradeOrder = {"Outstanding":0,"Very Satisfactory":1,"Satisfactory":2,"Needs Improvement":3};
-const gradeClass = {"Outstanding":"grade-outstanding","Very Satisfactory":"grade-very-satisfactory","Satisfactory":"grade-satisfactory","Needs Improvement":"grade-needs-improvement"};
-const statusLabel = {"office":"OFFICE 근무","home":"HOME 근무"};
-const gradeLabel = {"Outstanding":"Outstanding","Very Satisfactory":"Very Satisfactory","Satisfactory":"Satisfactory","Needs Improvement":"Needs Improvement"};
-
-function sortTeachers(arr, by) {
-  const copy = [...arr];
-  switch(by) {
-    case 'salary': return copy.sort((a,b) => b.salary - a.salary);
-    case 'grade': return copy.sort((a,b) => gradeOrder[a.grade] - gradeOrder[b.grade] || b.salary - a.salary);
-    case 'rate': return copy.sort((a,b) => b.rate - a.rate);
-    case 'name': return copy.sort((a,b) => a.name.localeCompare(b.name));
-  }
-  return copy;
-}
-
-function groupTeachers(arr, by) {
-  if (by === 'none') return [{ label: '전체 교사', teachers: arr }];
-  if (by === 'status') {
-    const office = arr.filter(t => t.status === 'office');
-    const home = arr.filter(t => t.status === 'home');
-    return [
-      { label: statusLabel['office'], teachers: office },
-      { label: statusLabel['home'], teachers: home }
-    ];
-  }
-  if (by === 'grade') {
-    const groups = {};
-    arr.forEach(t => {
-      if (!groups[t.grade]) groups[t.grade] = [];
-      groups[t.grade].push(t);
-    });
-    return Object.keys(groups).sort((a,b) => gradeOrder[a] - gradeOrder[b])
-      .map(g => ({ label: gradeLabel[g], teachers: groups[g] }));
-  }
-}
-
-// Squarified treemap algorithm
-function squarify(items, x, y, w, h) {
-  if (items.length === 0) return [];
-  if (items.length === 1) {
-    items[0]._x = x; items[0]._y = y; items[0]._w = w; items[0]._h = h;
-    return items;
-  }
-
-  const total = items.reduce((s, i) => s + i._area, 0);
-  const sorted = [...items].sort((a, b) => b._area - a._area);
-
-  let result = [];
-  layoutRow(sorted, 0, x, y, w, h, total, result);
-  return result;
-}
-
-function layoutRow(items, start, x, y, w, h, totalArea, result) {
-  if (start >= items.length) return;
-  if (start === items.length - 1) {
-    items[start]._x = x;
-    items[start]._y = y;
-    items[start]._w = w;
-    items[start]._h = h;
-    result.push(items[start]);
-    return;
-  }
-
-  const horizontal = w >= h;
-  let rowItems = [items[start]];
-  let rowArea = items[start]._area;
-  let bestRatio = worstRatio(rowItems, rowArea, totalArea, horizontal ? w : h, horizontal ? h : w);
-
-  for (let i = start + 1; i < items.length; i++) {
-    const testItems = [...rowItems, items[i]];
-    const testArea = rowArea + items[i]._area;
-    const ratio = worstRatio(testItems, testArea, totalArea, horizontal ? w : h, horizontal ? h : w);
-    if (ratio <= bestRatio) {
-      rowItems.push(items[i]);
-      rowArea = testArea;
-      bestRatio = ratio;
-    } else break;
-  }
-
-  const rowFrac = rowArea / totalArea;
-  let cx = x, cy = y;
-
-  if (horizontal) {
-    const rowW = w * rowFrac;
-    rowItems.forEach(item => {
-      const frac = item._area / rowArea;
-      item._x = cx;
-      item._y = cy;
-      item._w = rowW;
-      item._h = h * frac;
-      cy += item._h;
-      result.push(item);
-    });
-    layoutRow(items, start + rowItems.length, x + rowW, y, w - rowW, h, totalArea - rowArea, result);
-  } else {
-    const rowH = h * rowFrac;
-    rowItems.forEach(item => {
-      const frac = item._area / rowArea;
-      item._x = cx;
-      item._y = cy;
-      item._w = w * frac;
-      item._h = rowH;
-      cx += item._w;
-      result.push(item);
-    });
-    layoutRow(items, start + rowItems.length, x, y + rowH, w, h - rowH, totalArea - rowArea, result);
-  }
-}
-
-function worstRatio(items, rowArea, totalArea, side, otherSide) {
-  const rowFrac = rowArea / totalArea;
-  const rowSize = otherSide; // not used in simple version
-  let worst = 0;
-  items.forEach(item => {
-    const frac = item._area / rowArea;
-    const w = side * rowFrac;
-    const h = otherSide * frac;
-    const ratio = Math.max(w/h, h/w);
-    if (ratio > worst) worst = ratio;
-  });
-  return worst;
-}
-
-function render() {
-  const sortBy = document.getElementById('sortBy').value;
-  const groupBy = document.getElementById('groupBy').value;
-
-  const sorted = sortTeachers(teachers, sortBy);
-  const groups = groupTeachers(sorted, groupBy);
-
-  const container = document.getElementById('treemap');
-  container.innerHTML = '';
-
-  const totalSalary = teachers.reduce((s, t) => s + t.salary, 0);
-  const containerRect = container.getBoundingClientRect();
-
-  groups.forEach(group => {
-    const groupSalary = group.teachers.reduce((s, t) => s + t.salary, 0);
-    const groupFrac = groupSalary / totalSalary;
-
-    const groupEl = document.createElement('div');
-    groupEl.className = 'group';
-    groupEl.style.flex = groupFrac;
-    groupEl.style.minWidth = '0';
-
-    const headerEl = document.createElement('div');
-    headerEl.className = 'group-header';
-    headerEl.textContent = `${group.label}  —  ₱${groupSalary.toLocaleString('en',{maximumFractionDigits:0})}`;
-    groupEl.appendChild(headerEl);
-
-    const bodyEl = document.createElement('div');
-    bodyEl.className = 'group-body';
-    bodyEl.style.position = 'relative';
-    groupEl.appendChild(groupEl.querySelector('.group-header') ? groupEl.removeChild(headerEl) || headerEl : headerEl);
-    groupEl.appendChild(headerEl);
-    groupEl.appendChild(bodyEl);
-
-    container.appendChild(groupEl);
-
-    // Use setTimeout to ensure DOM is fully rendered before measuring
-    setTimeout(() => {
-      const rect = bodyEl.getBoundingClientRect();
-      const W = rect.width - 6;
-      const H = rect.height - 6;
-
-      const items = group.teachers.map(t => ({ ...t, _area: t.salary }));
-      squarify(items, 0, 0, W, H);
-
-      bodyEl.style.position = 'relative';
-      bodyEl.innerHTML = '';
-
-      items.forEach(item => {
-        const cell = document.createElement('div');
-        cell.className = `cell ${gradeClass[item.grade]}`;
-        cell.style.position = 'absolute';
-        cell.style.left = item._x + 'px';
-        cell.style.top = item._y + 'px';
-        cell.style.width = Math.max(item._w - 3, 0) + 'px';
-        cell.style.height = Math.max(item._h - 3, 0) + 'px';
-
-        const w = item._w;
-        const h = item._h;
-        const nameSize = Math.max(9, Math.min(22, Math.floor(Math.min(w, h) / 4.5)));
-        const salarySize = Math.max(7, nameSize - 4);
-
-        let html = `<div class="name" style="font-size:${nameSize}px">${item.name}</div>`;
-        if (w > 50 && h > 35) {
-          html += `<div class="salary" style="font-size:${salarySize}px">₱${item.salary.toLocaleString('en',{maximumFractionDigits:0})}</div>`;
-        }
-        if (w > 70 && h > 55) {
-          html += `<div class="grade-tag">${item.grade}</div>`;
-        }
-        if (w > 80 && h > 70) {
-          html += `<div class="rate">₱${item.rate}/10min</div>`;
-        }
-
-        cell.innerHTML = html;
-        cell.addEventListener('mouseenter', (e) => showTooltip(e, item));
-        cell.addEventListener('mousemove', (e) => moveTooltip(e));
-        cell.addEventListener('mouseleave', hideTooltip);
-        bodyEl.appendChild(cell);
-      });
-    }, 50);
-  });
-
-  document.getElementById('totalInfo').textContent =
-    `총 교사: ${teachers.length}명  |  총 급여: ₱${totalSalary.toLocaleString('en',{maximumFractionDigits:0})}  |  평균: ₱${(totalSalary/teachers.length).toFixed(0)}`;
-}
-
-function showTooltip(e, t) {
-  const tip = document.getElementById('tooltip');
-  const gradeColor = {"Outstanding":"#00c853","Very Satisfactory":"#4caf50","Satisfactory":"#999","Needs Improvement":"#ef5350"};
-  tip.innerHTML = `
-    <div class="t-name" style="color:${gradeColor[t.grade]}">${t.name}</div>
-    <div class="t-row"><span class="t-label">월급</span><span class="t-value">₱${t.salary.toLocaleString('en',{maximumFractionDigits:1})}</span></div>
-    <div class="t-row"><span class="t-label">10분 단가</span><span class="t-value">₱${t.rate}</span></div>
-    <div class="t-row"><span class="t-label">평가 등급</span><span class="t-value" style="color:${gradeColor[t.grade]}">${t.grade}</span></div>
-    <div class="t-row"><span class="t-label">가중 점수</span><span class="t-value">${t.weighted}</span></div>
-    <div class="t-row"><span class="t-label">근무형태</span><span class="t-value">${t.status.toUpperCase()}</span></div>
-    <div class="t-row"><span class="t-label">경력</span><span class="t-value">${t.years}년</span></div>
-    <div style="margin-top:8px;padding-top:8px;border-top:1px solid #2a2a4a;font-size:10px;color:#666">
-      수업(${t.scores.inst}) · 유지(${t.scores.ret}) · 출석(${t.scores.punct}) · 행정(${t.scores.admin}) · 기여(${t.scores.contrib})
-    </div>
-  `;
-  tip.classList.add('visible');
-  moveTooltip(e);
-}
-
-function moveTooltip(e) {
-  const tip = document.getElementById('tooltip');
-  let x = e.clientX + 16;
-  let y = e.clientY + 16;
-  const rect = tip.getBoundingClientRect();
-  if (x + rect.width > window.innerWidth) x = e.clientX - rect.width - 16;
-  if (y + rect.height > window.innerHeight) y = e.clientY - rect.height - 16;
-  tip.style.left = x + 'px';
-  tip.style.top = y + 'px';
-}
-
-function hideTooltip() {
-  document.getElementById('tooltip').classList.remove('visible');
-}
-
-document.getElementById('sortBy').addEventListener('change', render);
-document.getElementById('groupBy').addEventListener('change', render);
-
-render();
-window.addEventListener('resize', render);
-</script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="MANGOI 교사 대시보드 - 급여, 평가, 분석 지표"
+    />
+    <title>MANGOI | 대시보드</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ["Noto Sans KR", "sans-serif"] },
+            colors: {
+              primary: {
+                50: "#f0f7ff",
+                500: "#0c8ee6",
+                600: "#0070c4",
+                900: "#0b406d",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="bg-gray-50 font-sans text-gray-800">
+    <!-- 공통 헤더 -->
+    <header class="header">
+      <div
+        class="header__container max-w-6xl mx-auto px-4 py-4 flex justify-between items-center"
+      >
+        <div
+          class="header__logo font-bold text-2xl text-primary-600 tracking-tight"
+        >
+          <a href="index.html"
+            >MANGOI
+            <span class="text-sm font-normal text-gray-500">Dashboard</span></a
+          >
+        </div>
+        <nav class="header__nav">
+          <ul class="flex space-x-6 text-sm font-medium text-gray-600">
+            <li>
+              <a
+                href="index.html"
+                class="header__nav-link header__nav-link--active text-primary-600"
+                >Home</a
+              >
+            </li>
+            <li>
+              <a
+                href="heatmap.html"
+                class="header__nav-link hover:text-primary-500 transition-colors"
+                >Heatmap</a
+              >
+            </li>
+            <li>
+              <a
+                href="treemap.html"
+                class="header__nav-link hover:text-primary-500 transition-colors"
+                >Treemap</a
+              >
+            </li>
+            <li>
+              <a
+                href="calculator.html"
+                class="header__nav-link hover:text-primary-500 transition-colors"
+                >Salary Calculator</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- 메인 대시보드 (메뉴 3가지 카드) -->
+    <main class="dashboard-main max-w-6xl mx-auto px-4 py-12">
+      <div class="text-center mb-12">
+        <h1 class="text-3xl font-bold text-gray-900 mb-3">
+          MANGOI Teacher Analytics
+        </h1>
+        <p class="text-gray-500">
+          교사 평가 및 급여 데이터를 쉽게 확인하고 계산하세요.
+        </p>
+      </div>
+
+      <div class="dashboard__cards grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Heatmap Card -->
+        <a
+          href="heatmap.html"
+          class="card card--interactive group block bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all hover:-translate-y-1"
+        >
+          <div
+            class="card__icon inline-flex items-center justify-center w-12 h-12 rounded-lg bg-blue-50 text-primary-500 mb-4 group-hover:bg-primary-500 group-hover:text-white transition-colors"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+              ></path>
+            </svg>
+          </div>
+          <h2 class="card__title text-lg font-bold text-gray-900 mb-2">
+            Data Heatmap
+          </h2>
+          <p class="card__desc text-sm text-gray-500 line-clamp-2">
+            교사들의 평가 지표와 출석률 데이터를 표 형식의 히트맵으로 한눈에
+            분석합니다.
+          </p>
+        </a>
+
+        <!-- Treemap Card -->
+        <a
+          href="treemap.html"
+          class="card card--interactive group block bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all hover:-translate-y-1"
+        >
+          <div
+            class="card__icon inline-flex items-center justify-center w-12 h-12 rounded-lg bg-green-50 text-green-500 mb-4 group-hover:bg-green-500 group-hover:text-white transition-colors"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
+              ></path>
+            </svg>
+          </div>
+          <h2 class="card__title text-lg font-bold text-gray-900 mb-2">
+            Salary Treemap
+          </h2>
+          <p class="card__desc text-sm text-gray-500 line-clamp-2">
+            교사 성과(면적=급여, 색상=등급)를 시각적인 타일 UI(Treemap)로
+            확인합니다.
+          </p>
+        </a>
+
+        <!-- Calculator Card -->
+        <a
+          href="calculator.html"
+          class="card card--interactive group block bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all hover:-translate-y-1"
+        >
+          <div
+            class="card__icon inline-flex items-center justify-center w-12 h-12 rounded-lg bg-purple-50 text-purple-500 mb-4 group-hover:bg-purple-500 group-hover:text-white transition-colors"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+              ></path>
+            </svg>
+          </div>
+          <h2 class="card__title text-lg font-bold text-gray-900 mb-2">
+            Salary Calculator
+          </h2>
+          <p class="card__desc text-sm text-gray-500 line-clamp-2">
+            항목별 평가 점수를 기준으로 10분당 수업료 및 최종 등급을 자동으로
+            계산합니다.
+          </p>
+        </a>
+      </div>
+    </main>
+  </body>
 </html>

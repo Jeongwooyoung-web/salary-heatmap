@@ -1,0 +1,35 @@
+.header {
+  background-color: $color-white;
+  border-bottom: 1px solid $color-gray-200;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+
+  &__container {
+    height: 70px;
+  }
+
+  &__logo {
+    a {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+  }
+
+  &__nav {
+    &-link {
+      padding: 8px 12px;
+      border-radius: $border-radius-md;
+
+      &--active {
+        background-color: $color-primary-50;
+        font-weight: 600;
+      }
+
+      &:hover:not(&--active) {
+        background-color: $color-gray-50;
+      }
+    }
+  }
+}

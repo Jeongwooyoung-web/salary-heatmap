@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MANGOI | Salary Treemap</title>
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ["Noto Sans KR", "sans-serif"] },
+            colors: {
+              primary: {
+                50: "#f0f7ff",
+                500: "#0c8ee6",
+                600: "#0070c4",
+                900: "#0b406d",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="bg-gray-50 font-sans text-gray-800">
+    <header class="header">
+      <div
+        class="header__container max-w-6xl mx-auto px-4 py-4 flex justify-between items-center"
+      >
+        <div
+          class="header__logo font-bold text-2xl text-primary-600 tracking-tight"
+        >
+          <a href="index.html"
+            >MANGOI
+            <span class="text-sm font-normal text-gray-500">Dashboard</span></a
+          >
+        </div>
+        <nav class="header__nav">
+          <ul class="flex space-x-6 text-sm font-medium text-gray-600">
+            <li>
+              <a
+                href="index.html"
+                class="header__nav-link hover:text-primary-500 transition-colors"
+                >Home</a
+              >
+            </li>
+            <li>
+              <a
+                href="heatmap.html"
+                class="header__nav-link hover:text-primary-500 transition-colors"
+                >Heatmap</a
+              >
+            </li>
+            <li>
+              <a
+                href="treemap.html"
+                class="header__nav-link header__nav-link--active text-primary-600"
+                >Treemap</a
+              >
+            </li>
+            <li>
+              <a
+                href="calculator.html"
+                class="header__nav-link hover:text-primary-500 transition-colors"
+                >Salary Calculator</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main
+      class="max-w-6xl mx-auto px-4 py-8 h-[calc(100vh-140px)] flex flex-col"
+    >
+      <div class="mb-4 flex justify-between items-end flex-wrap gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 mb-1">
+            Salary Treemap
+            <span class="text-lg font-normal text-gray-500">(급여 트리맵)</span>
+          </h1>
+          <p class="text-sm text-gray-500">크기 = 급여, 색상 = 평가 등급</p>
+        </div>
+
+        <!-- 컨트롤 메뉴 -->
+        <div
+          class="flex items-center gap-4 text-sm bg-white p-2 rounded-lg border border-gray-200"
+        >
+          <div class="flex items-center gap-2">
+            <label for="sort-dropdown" class="text-gray-700 font-medium"
+              >정렬 기준:</label
+            >
+            <select
+              id="sort-dropdown"
+              class="bg-gray-50 border border-gray-300 rounded px-2 py-1 outline-none focus:border-primary-500"
+            >
+              <option value="salary-desc">급여 (높은순)</option>
+              <option value="salary-asc">급여 (낮은순)</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2">
+            <label for="group-dropdown" class="text-gray-700 font-medium"
+              >그룹:</label
+            >
+            <select
+              id="group-dropdown"
+              class="bg-gray-50 border border-gray-300 rounded px-2 py-1 outline-none focus:border-primary-500"
+            >
+              <option value="location">근무형태 (Office/Home)</option>
+              <option value="none">그룹 없음</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 범례 -->
+      <div
+        class="flex flex-wrap gap-4 text-xs font-bold justify-end mb-4"
+        id="legend-container"
+      >
+        <!-- JS로 채워짐 -->
+      </div>
+
+      <!-- 트리맵 컨테이너 -->
+      <div
+        class="flex-grow bg-white rounded-xl shadow-sm border border-gray-200 p-2 overflow-hidden relative"
+        id="treemap-container"
+      >
+        <!-- JS로 렌더링됨 -->
+      </div>
+
+      <!-- 요약 바 -->
+      <div
+        class="mt-4 text-sm text-gray-500 text-right bg-white p-3 rounded-lg border border-gray-200"
+        id="summary-bar"
+      >
+        총 교사: <span id="total-count">0</span>명 | 총 급여:
+        <span id="total-salary">0</span> Peso | 평균:
+        <span id="avg-salary">0</span> Peso
+      </div>
+    </main>
+
+    <script src="js/data.js"></script>
+    <script src="js/treemap.js"></script>
+  </body>
+</html>
